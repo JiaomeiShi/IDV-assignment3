@@ -62,85 +62,218 @@
 <body>
   <h1>IDV Assignment 3 — D3 Replications (Charts 7–11)</h1>
   <p class="subtitle">
-    Replications of the reference figures using SVG and D3.js, with basic transitions and interactions.
+    D3.js replications of Charts 7–11 from the assignment handout.  
+    Below each chart I document, step by step, how I built it with the help of a chatbot.
   </p>
 
   <!-- Chart 7 -->
   <div class="chart-card">
     <h2 class="chart-title">Chart 7 — Venn Diagram</h2>
-    <p class="chart-subtitle">Three-set Venn diagram showing overlapping regions I–VII.</p>
+    <p class="chart-subtitle">Three-set Venn diagram with regions I–VII.</p>
     <div id="chart7"></div>
-    <p class="note">
-      <strong>Note:</strong> This chart replicates the three-set Venn diagram with labeled regions (I–VII).
-      Position and size of the circles are encoded using the x/y coordinates and radius of each set.
-      Color hue encodes the three categories (Replace, Delete, Rewrite), while opacity highlights the
-      overlapping areas in the center. Text labels in each region support precise reading of the sets.
-      A soft growing animation is used when the circles are drawn, and hover interactions subtly
-      increase opacity to emphasize individual sets.
-    </p>
+    <div class="note">
+      <strong>Process notes for Chart 7 (Venn diagram):</strong>
+      <ol>
+        <li>
+          First I showed the reference Venn diagram to the chatbot and asked how to recreate it using
+          plain SVG. We broke the figure into three circles with different centers and the same radius.
+          The chatbot suggested coordinates and I adjusted them manually until the overlaps looked
+          similar to the original.
+        </li>
+        <li>
+          Next, I asked how to label the regions I–VII. The chatbot proposed hard-coding the positions
+          of each label as text elements. I copied the suggested <code>x,y</code> values and then tweaked
+          them by trial and error so that each label visually sits in the correct overlapping area.
+        </li>
+        <li>
+          After the static diagram worked, I wanted some interaction. I asked specifically for
+          “hover effects that make each circle slightly larger and more opaque when the mouse is over it”.
+          The chatbot showed me how to use D3’s <code>on("mouseover")</code> and
+          <code>on("mouseout")</code> with transitions that change the radius and fill opacity.
+          I reused this pattern for all three circles.
+        </li>
+        <li>
+          Finally, I added simple text labels (“Delete”, “Replace”, “Rewrite”) above the three sets.
+          I used a short fade-in transition for both the region labels and set labels so that the chart
+          feels more alive when the page loads.
+        </li>
+      </ol>
+      <p>
+        In summary, this chart helped me practice positioning shapes by hand in SVG, and using D3
+        transitions to create subtle hover feedback without changing the underlying data.
+      </p>
+    </div>
   </div>
 
   <!-- Chart 8 -->
   <div class="chart-card">
     <h2 class="chart-title">Chart 8 — Cross Validation Accuracy Bars</h2>
-    <p class="chart-subtitle">Simple bar chart with dashed “baseline” bars in the background.</p>
+    <p class="chart-subtitle">Grouped bars with a solid accuracy bar and a dashed baseline bar for each model.</p>
     <div id="chart8"></div>
-    <p class="note">
-      <strong>Note:</strong> Here the horizontal position encodes the model category (BERT, RoBERTa, BART),
-      and bar height encodes cross-validation accuracy in percentage. Solid yellow bars show the reported
-      accuracy values, while dashed outline bars encode a lower comparison baseline for each model.
-      Axes and a chart title support quantitative reading. The bars grow upward with a staggered animation,
-      the dashed baselines and labels fade in afterwards, and hover highlights each bar with a tooltip
-      showing the exact value.
-    </p>
+    <div class="note">
+      <strong>Process notes for Chart 8 (bar chart):</strong>
+      <ol>
+        <li>
+          I started by asking the chatbot to help me translate the reference figure into a small dataset
+          for three models (BERT, RoBERTa, BART) with two values each: the main accuracy and a lower
+          dashed baseline. We decided to store the numbers in a JavaScript array of objects.
+        </li>
+        <li>
+          With the data structure ready, I requested a basic D3 bar chart template. The chatbot
+          generated the usual pattern: define margins, width and height, create a band scale for the
+          x-axis, a linear scale for the y-axis, and append axes. I then inserted my own values and
+          axis labels.
+        </li>
+        <li>
+          To match the visual style of the assignment chart, I asked how to draw a solid bar plus a
+          dashed “outline bar” on top. The chatbot suggested drawing one rectangle for the solid bar
+          and a second rectangle with <code>fill="none"</code> and <code>stroke-dasharray</code>
+          for the dashed baseline. I used slight horizontal offsets so the shapes overlap cleanly.
+        </li>
+        <li>
+          For interaction, I requested a hover effect where the bar becomes taller and lighter,
+          and also shows a tooltip with the exact percentage. The chatbot showed me how to attach a
+          mouseover handler that changes <code>y</code>, <code>height</code>, and <code>fill</code>,
+          and how to use a shared tooltip <code>&lt;div&gt;</code> positioned with <code>event.pageX</code>
+          and <code>event.pageY</code>. I reused the same tooltip pattern across charts.
+        </li>
+        <li>
+          As a final touch, we added a simple load-in animation where bars grow from height 0.
+          This gave me practice with D3 transitions and also made the chart feel less static.
+        </li>
+      </ol>
+      <p>
+        Through this chart I reinforced the full D3 “pipeline”: mapping data to scales, drawing rectangles,
+        and layering interactions (tooltips and animated transitions) step by step.
+      </p>
+    </div>
   </div>
 
   <!-- Chart 9 -->
   <div class="chart-card">
     <h2 class="chart-title">Chart 9 — Sketch to SVG Figure</h2>
-    <p class="chart-subtitle">Line-drawing style character sitting on a block, recreated as SVG paths.</p>
+    <p class="chart-subtitle">Line-drawing style character sitting on a block.</p>
     <div id="chart9"></div>
-    <p class="note">
-      <strong>Note:</strong> This chart demonstrates how a hand-drawn sketch can be translated into vector
-      shapes in SVG. The character is decomposed into simple geometric primitives: rectangles for the
-      block and head, lines and paths for the limbs, and small markers for the hands and feet.
-      Using SVG ensures the figure is resolution-independent and can be styled or animated with D3.
-      The illustration fades in from transparent, and on hover the stroke weight increases slightly,
-      hinting that the figure is constructed from editable vector elements.
-    </p>
+    <div class="note">
+      <strong>Process notes for Chart 9 (sketch to SVG):</strong>
+      <ol>
+        <li>
+          I showed the hand-drawn reference sketch to the chatbot and asked how to “translate this into
+          basic SVG shapes”. We decomposed the figure into rectangles (block and head), straight lines
+          (body, arms, legs, stick) and small circles (hands). This step was more about thinking in
+          geometry than about data.
+        </li>
+        <li>
+          The chatbot proposed approximate coordinates for each segment. I pasted the code into my
+          <code>index.html</code> and repeatedly refreshed the browser, moving points a few pixels at a time
+          until the posture of the character looked close to the original sketch.
+        </li>
+        <li>
+          To make it more than just a static drawing, I asked how to add a simple animation.
+          We decided to let the whole group fade in from 0 to full opacity, and to make the strokes
+          slightly thicker when the mouse hovers over the illustration. This only required changing the
+          group’s <code>stroke-width</code> inside <code>mouseover</code> and <code>mouseout</code> handlers.
+        </li>
+        <li>
+          Compared to the other charts, this one does not have numeric data. However, it trained me to
+          think about how complex visual designs can be broken down into reusable primitives that D3 can
+          manipulate just like any other shape.
+        </li>
+      </ol>
+      <p>
+        Overall, this chart documents my experience of turning a freehand drawing into clean SVG code,
+        with the chatbot guiding me through the coordinate system and the minimal amount of code needed
+        to get a similar look.
+      </p>
+    </div>
   </div>
 
   <!-- Chart 10 -->
   <div class="chart-card">
     <h2 class="chart-title">Chart 10 — Map with Highlighted Region</h2>
-    <p class="chart-subtitle">Abstract map with land shapes and a red ellipse indicating the focus area.</p>
+    <p class="chart-subtitle">Abstract map with four land masses and a red focus ellipse.</p>
     <div id="chart10"></div>
-    <p class="note">
-      <strong>Note:</strong> This figure approximates the reference map using a set of polygonal land masses
-      drawn in a muted yellow, overlaid on a light grid to suggest geographic coordinates.
-      A red elliptical outline encodes the area of interest, guiding the viewer’s attention to a
-      particular sub-region. The whole map gently zooms in on load, while the land shapes fade in,
-      making the focus region more visually salient without relying on textual labels.
-    </p>
+    <div class="note">
+      <strong>Process notes for Chart 10 (abstract map):</strong>
+      <ol>
+        <li>
+          For this chart I explained to the chatbot that I did not need a real geographic map, only a
+          stylised version matching the handout: a light grid, several yellow land shapes and a red
+          ellipse indicating the focus region. The chatbot suggested using a fixed SVG coordinate system
+          and drawing polygons with hard-coded points.
+        </li>
+        <li>
+          We first implemented the background grid using two loops that draw vertical and horizontal
+          lines every fixed number of pixels. Seeing this work gave me an intuitive sense that the SVG
+          coordinate system is like a simple Cartesian plane.
+        </li>
+        <li>
+          Next, the chatbot helped me define four polygon point lists for the land masses. I pasted its
+          initial guesses and then manually adjusted the coordinates so that the shapes and gaps roughly
+          resembled the original figure. The red ellipse was placed by eye at the center of the main
+          cluster.
+        </li>
+        <li>
+          To add interaction, I requested hover effects on the land shapes. The chatbot proposed
+          changing the fill colour slightly brighter on <code>mouseover</code>. We also added a gentle
+          zoom-in animation of the whole map group on load, which is implemented as a transition on the
+          <code>transform: scale()</code> value.
+        </li>
+      </ol>
+      <p>
+        This chart was mainly an exercise in controlling SVG coordinates, using loops to draw grids,
+        and applying hover feedback to non-data-driven shapes while still using D3’s selection and
+        transition APIs.
+      </p>
+    </div>
   </div>
 
   <!-- Chart 11 -->
   <div class="chart-card">
     <h2 class="chart-title">Chart 11 — Probability Density Functions</h2>
-    <p class="chart-subtitle">Two Gaussian curves with a shaded overlapping region and reference lines.</p>
+    <p class="chart-subtitle">Two Gaussian curves with a shaded overlapping region and vertical reference lines.</p>
     <div id="chart11"></div>
-    <p class="note">
-      <strong>Note:</strong> This chart shows two probability density functions as smooth lines over the
-      same x-axis. Each curve encodes a different class distribution via color (gold vs teal).
-      The filled grey area represents the overlapping region where the densities are similar,
-      highlighting potential classification ambiguity. Vertical dashed reference lines support
-      reading of decision thresholds. The overlapping area fades in first, and then each curve
-      is drawn with a “line drawing” animation, reinforcing the idea that the curves come from
-      analytic probability density functions.
-    </p>
+    <div class="note">
+      <strong>Process notes for Chart 11 (function plot):</strong>
+      <ol>
+        <li>
+          I told the chatbot that the original chart looked like two normal distributions with some
+          overlapping area. It suggested writing a JavaScript <code>gaussian()</code> function that
+          takes <code>x</code>, mean and standard deviation and returns the probability density.
+          We then sampled this function on a fine <code>x</code> grid using <code>d3.range()</code>.
+        </li>
+        <li>
+          The chatbot provided a D3 line generator that maps each sampled point into SVG coordinates.
+          I copied the code twice, once for each curve with different means and sigmas, and adjusted the
+          domain of the x- and y-scales so the curves fit nicely inside the viewBox.
+        </li>
+        <li>
+          To recreate the shaded overlap, the chatbot proposed building a third dataset whose y-value
+          is <code>min(y0, y1)</code> at each x. Using <code>d3.area()</code>, we filled this region
+          with a semi-transparent grey polygon. Later, I added a hover effect that darkens the overlap
+          slightly to draw attention to the ambiguous region.
+        </li>
+        <li>
+          I asked specifically for a “line drawing” animation. The chatbot taught me how to obtain the
+          total path length using <code>getTotalLength()</code> and then use
+          <code>stroke-dasharray</code> and <code>stroke-dashoffset</code> transitions so that each
+          curve appears to be drawn over time. I reused this trick for both curves with different delays.
+        </li>
+        <li>
+          Finally, we added vertical dashed reference lines and a small legend that labels each curve as
+          <code>p(x, y = 0) * v(x)</code> and <code>p(x, y = 1) * v(x)</code>. This gave the figure a
+          more “textbook” look, similar to the assignment handout.
+        </li>
+      </ol>
+      <p>
+        This chart combined several ideas from previous ones: analytic functions, area fills, animations,
+        and basic annotation, all constructed gradually with the guidance of the chatbot and iterative
+        testing in the browser.
+      </p>
+    </div>
   </div>
-  
-    <script>
+
+  <script>
     // Shared tooltip (for bar chart)
     const tooltip = d3.select("body")
       .append("div")
@@ -467,7 +600,7 @@
         .duration(800)
         .style("opacity", 1);
 
-      // hover：线条加粗一点
+      // hover: stroke width change
       g.on("mouseover", function() {
           d3.select(this).transition().duration(150).attr("stroke-width", 2);
         })
@@ -524,7 +657,7 @@
         [[190, 150],[250, 160],[260, 195],[220, 210],[190, 190]]
       ];
 
-      const landPolys = g.selectAll("polygon.land")
+      g.selectAll("polygon.land")
         .data(land)
         .enter()
         .append("polygon")
@@ -553,7 +686,7 @@
         .attr("stroke", "#dc2626")
         .attr("stroke-width", 2);
 
-      // 整个地图缩放+淡入
+      // zoom + fade-in
       g.transition()
         .duration(900)
         .attr("transform", `translate(${margin.left},${margin.top}) scale(1)`)
@@ -649,7 +782,6 @@
         .duration(700)
         .attr("opacity", 0.5);
 
-      // Gaussian curves with line drawing + hover
       const path0 = svg.append("path")
         .datum(data0)
         .attr("fill", "none")
@@ -694,7 +826,7 @@
         .duration(900)
         .attr("stroke-dashoffset", 0);
 
-      // hover on overlap area：变深一点
+      // hover on overlap area
       overlapPath
         .on("mouseover", function() {
           d3.select(this).transition().duration(150).attr("opacity", 0.8);
@@ -748,6 +880,5 @@
     drawChart10();
     drawChart11();
   </script>
-  
 </body>
 </html>
