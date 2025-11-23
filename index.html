@@ -1,40 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>D3 Rectangle Disappear on Scroll</title>
+  <meta charset="UTF-8" />
+  <title>IDV Assignment 3 — Charts 7–11</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
-    table { border-collapse: collapse; }
-    td { border: 1px solid #333; padding: 16px; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      margin: 0;
+      padding: 32px;
+      background: #eef4f4;
+    }
+    h1 {
+      margin: 0 0 8px;
+    }
+    .subtitle {
+      margin: 0 0 24px;
+      color: #4b5563;
+    }
+    .chart-card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      padding: 20px;
+      margin-bottom: 28px;
+    }
+    .chart-title {
+      margin: 0 0 4px;
+    }
+    .chart-subtitle {
+      margin: 0 0 16px;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    .note {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px dashed #e5e7eb;
+      font-size: 0.9rem;
+      color: #374151;
+      line-height: 1.5;
+    }
+    .note strong {
+      color: #111827;
+    }
+    svg {
+      font-family: inherit;
+    }
+    .tooltip {
+      position: absolute;
+      background: rgba(17,24,39,0.95);
+      color: #f9fafb;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      pointer-events: none;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
-  <table>
-    <tr>
-      <td id="svg-cell">
-        <!-- SVG will be inserted here by D3 -->
-      </td>
-    </tr>
-  </table>
-  <div style="height: 1500px;"></div>
+  <h1>IDV Assignment 3 — D3 Replications (Charts 7–11)</h1>
+  <p class="subtitle">
+    Replications of the reference figures using SVG and D3.js, with basic transitions and interactions.
+  </p>
+
+  <!-- Chart 7 -->
+  <div class="chart-card">
+    <h2 class="chart-title">Chart 7 — Venn Diagram</h2>
+    <p class="chart-subtitle">Three-set Venn diagram showing overlapping regions I–VII.</p>
+    <div id="chart7"></div>
+    <p class="note">
+      <strong>Note:</strong> This chart replicates the three-set Venn diagram with labeled regions (I–VII).
+      Position and size of the circles are encoded using the x/y coordinates and radius of each set.
+      Color hue encodes the three categories (Replace, Delete, Rewrite), while opacity highlights the
+      overlapping areas in the center. Text labels in each region support precise reading of the sets.
+      A soft growing animation is used when the circles are drawn, and hover interactions subtly
+      increase opacity to emphasize individual sets.
+    </p>
+  </div>
+
+  <!-- Chart 8 -->
+  <div class="chart-card">
+    <h2 class="chart-title">Chart 8 — Cross Validation Accuracy Bars</h2>
+    <p class="chart-subtitle">Simple bar chart with dashed “baseline” bars in the background.</p>
+    <div id="chart8"></div>
+    <p class="note">
+      <strong>Note:</strong> Here the horizontal position encodes the model category (BERT, RoBERTa, BART),
+      and bar height encodes cross-validation accuracy in percentage. Solid yellow bars show the reported
+      accuracy values, while dashed outline bars encode a lower comparison baseline for each model.
+      Axes and a chart title support quantitative reading. The bars grow upward with a staggered animation,
+      the dashed baselines and labels fade in afterwards, and hover highlights each bar with a tooltip
+      showing the exact value.
+    </p>
+  </div>
+
+  <!-- Chart 9 -->
+  <div class="chart-card">
+    <h2 class="chart-title">Chart 9 — Sketch to SVG Figure</h2>
+    <p class="chart-subtitle">Line-drawing style character sitting on a block, recreated as SVG paths.</p>
+    <div id="chart9"></div>
+    <p class="note">
+      <strong>Note:</strong> This chart demonstrates how a hand-drawn sketch can be translated into vector
+      shapes in SVG. The character is decomposed into simple geometric primitives: rectangles for the
+      block and head, lines and paths for the limbs, and small markers for the hands and feet.
+      Using SVG ensures the figure is resolution-independent and can be styled or animated with D3.
+      The illustration fades in from transparent, and on hover the stroke weight increases slightly,
+      hinting that the figure is constructed from editable vector elements.
+    </p>
+  </div>
+
+  <!-- Chart 10 -->
+  <div class="chart-card">
+    <h2 class="chart-title">Chart 10 — Map with Highlighted Region</h2>
+    <p class="chart-subtitle">Abstract map with land shapes and a red ellipse indicating the focus area.</p>
+    <div id="chart10"></div>
+    <p class="note">
+      <strong>Note:</strong> This figure approximates the reference map using a set of polygonal land masses
+      drawn in a muted yellow, overlaid on a light grid to suggest geographic coordinates.
+      A red elliptical outline encodes the area of interest, guiding the viewer’s attention to a
+      particular sub-region. The whole map gently zooms in on load, while the land shapes fade in,
+      making the focus region more visually salient without relying on textual labels.
+    </p>
+  </div>
+
+  <!-- Chart 11 -->
+  <div class="chart-card">
+    <h2 class="chart-title">Chart 11 — Probability Density Functions</h2>
+    <p class="chart-subtitle">Two Gaussian curves with a shaded overlapping region and reference lines.</p>
+    <div id="chart11"></div>
+    <p class="note">
+      <strong>Note:</strong> This chart shows two probability density functions as smooth lines over the
+      same x-axis. Each curve encodes a different class distribution via color (gold vs teal).
+      The filled grey area represents the overlapping region where the densities are similar,
+      highlighting potential classification ambiguity. Vertical dashed reference lines support
+      reading of decision thresholds. The overlapping area fades in first, and then each curve
+      is drawn with a “line drawing” animation, reinforcing the idea that the curves come from
+      analytic probability density functions.
+    </p>
+  </div>
+
   <script>
-    // Append SVG rectangle to table cell
-    const svg = d3.select("#svg-cell")
-      .append("svg")
-      .attr("width", 100)
-      .attr("height", 100);
+    // Shared tooltip (for bar chart)
+    const tooltip = d3.select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
 
-    svg.append("rect")
-      .attr("width", 100)
-      .attr("height", 100)
-      .attr("fill", "steelblue")
-      .attr("id", "my-rect");
+    // =========================
+    // Chart 7: Venn diagram
+    // =========================
+    function drawChart7() {
+      const width = 420;
+      const height = 260;
 
-    // Hide rectangle on window scroll
-    window.addEventListener("scroll", () => {
-      d3.select("#my-rect").style("display", "none");
-    });
-  </script>
-</body>
-</html>
+      const svg = d3.select("#chart7")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+      const g = svg.append("g")
+        .attr("transform", "translate(0,10)");
+
+      const circles = [
+        { id: "A", cx: 150, cy: 120, r: 80, color: "#c4b5fd", label: "Delete" },
+        { id: "B", cx: 220, cy: 80,  r: 80, color: "#bfdbfe", label: "Replace" },
+        { id: "C", cx: 260, cy: 140, r: 80, color: "#fde68a", label: "Rewrite" }
+      ];
+
+      const circleSelection = g.selectAll("circle.venn")
+        .data(circles)
+        .enter()
+        .append("circle")
+        .attr("class", "venn")
+        .attr("cx", d => d.cx)
+        .attr("cy", d => d.cy)
+        .attr("r", 0)
+        .attr("fill", d => d.color)
+        .attr("fill-opacity", 0.2)
+        .attr("stroke", "#4b5563")
+        .attr("stroke-width", 1)
+        .on("mouseover", function(event, d) {
+          d3.select(this)
+            .transition().duration(200)
+            .attr("fill-opacity", 0.7);
+        })
+        .on("mouseout", function() {
+          d3.select(this)
+            .transition().duration(200)
+            .attr("fill-opacity", 0.5);
+        });
+
+      // grow circles
+      circleSelection
+        .transition()
+        .duration(800)
+        .attr("r", d => d.r)
+        .attr("fill-opacity", 0.55);
+
+      // Region labels (positions are hand-tuned)
+      const labels = [
+        { text: "I",  x: 90,  y: 140 },
+        { text: "II", x: 220, y: 30 },
+        { text: "III",x: 330, y: 145 },
+        { text: "IV", x: 165, y: 115 },
+        { text: "V",  x: 235, y: 110 },
+        { text: "VI", x: 205, y: 150 },
+        { text: "VII",x: 220, y: 130 }
+      ];
+
+      g.selectAll("text.region")
+        .data(labels)
+        .enter()
+        .append("text")
+        .attr("class", "region")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y)
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "central")
+        .style("font-size", "13px")
+        .style("fill", "#111827")
+        .style("opacity", 0)
+        .transition()
+        .delay(700)
+        .duration(500)
+        .style("opacity", 1)
+        .text(d => d.text);
+
+      // Set labels at top
+      g.append("text")
+        .attr("x", 70)
+        .attr("y", 30)
+        .style("font-size", "12px")
+        .style("opacity", 0)
+        .text("Delete")
+        .transition().delay(700).duration(500).style("opacity", 1);
+
+      g.append("text")
+        .attr("x", 210)
+        .attr("y", 20)
+        .style("font-size", "12px")
+        .style("opacity", 0)
+        .text("Replace")
+        .transition().delay(700).duration(500).style("opacity", 1);
+
+      g.append("text")
+        .attr("x", 330)
+        .attr("y", 40)
+        .style("font-size", "12px")
+        .style("opacity", 0)
+        .text("Rewrite")
+        .transition().delay(700).duration(500).style("opacity", 1);
+    }
+
+    // =========================
+    // Chart 8: Simple bars
+    // =========================
+    function drawChart8() {
+      const data = [
+        { model: "BERT",    base: 74.4, dashed: 64.8 },
+        { model: "RoBERTa", base: 81.9, dashed: 6
