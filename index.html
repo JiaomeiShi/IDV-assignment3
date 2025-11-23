@@ -139,8 +139,8 @@
       analytic probability density functions.
     </p>
   </div>
-
-  <script>
+  
+    <script>
     // Shared tooltip (for bar chart)
     const tooltip = d3.select("body")
       .append("div")
@@ -183,22 +183,23 @@
         .on("mouseover", function(event, d) {
           d3.select(this)
             .transition().duration(200)
-            .attr("fill-opacity", 0.7);
+            .attr("r", d.r + 6)
+            .attr("fill-opacity", 0.8);
         })
-        .on("mouseout", function() {
+        .on("mouseout", function(event, d) {
           d3.select(this)
             .transition().duration(200)
-            .attr("fill-opacity", 0.5);
+            .attr("r", d.r)
+            .attr("fill-opacity", 0.55);
         });
 
-      // grow circles
+      // grow circles on load
       circleSelection
         .transition()
         .duration(800)
         .attr("r", d => d.r)
         .attr("fill-opacity", 0.55);
 
-      // Region labels (positions are hand-tuned)
       const labels = [
         { text: "I",  x: 90,  y: 140 },
         { text: "II", x: 220, y: 30 },
@@ -227,7 +228,6 @@
         .style("opacity", 1)
         .text(d => d.text);
 
-      // Set labels at top
       g.append("text")
         .attr("x", 70)
         .attr("y", 30)
@@ -284,7 +284,6 @@
         .nice()
         .range([height, 0]);
 
-      // axes
       svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x));
@@ -292,7 +291,6 @@
       svg.append("g")
         .call(d3.axisLeft(y).ticks(5));
 
-      // baseline
       svg.append("line")
         .attr("x1", 0)
         .attr("x2", width)
@@ -301,8 +299,7 @@
         .attr("stroke", "#111827")
         .attr("stroke-width", 1);
 
-      // solid bars
-      svg.selectAll(".bar-base")
+      const bars = svg.selectAll(".bar-base")
         .data(data)
         .enter()
         .append("rect")
@@ -315,24 +312,33 @@
         .attr("stroke", "#b38f3b")
         .attr("stroke-width", 0.8)
         .on("mouseover", function(event, d) {
-          d3.select(this).attr("fill", "#fde68a");
+          d3.select(this)
+            .transition().duration(200)
+            .attr("y", y(d.base) - 5)
+            .attr("height", height - y(d.base) + 5)
+            .attr("fill", "#fde68a");
           tooltip
             .style("opacity", 1)
             .html(`<strong>${d.model}</strong><br/>Accuracy: ${d.base}%`)
             .style("left", (event.pageX + 10) + "px")
             .style("top", (event.pageY - 28) + "px");
         })
-        .on("mouseout", function() {
-          d3.select(this).attr("fill", "#f9e4a4");
+        .on("mouseout", function(event, d) {
+          d3.select(this)
+            .transition().duration(200)
+            .attr("y", y(d.base))
+            .attr("height", height - y(d.base))
+            .attr("fill", "#f9e4a4");
           tooltip.style("opacity", 0);
-        })
-        .transition()
+        });
+
+      // load animation
+      bars.transition()
         .delay((d, i) => i * 200)
         .duration(800)
         .attr("y", d => y(d.base))
         .attr("height", d => height - y(d.base));
 
-      // dashed bars (fade in after solid ones)
       svg.selectAll(".bar-dashed")
         .data(data)
         .enter()
@@ -352,7 +358,6 @@
         .duration(500)
         .style("opacity", 1);
 
-      // labels above bars
       svg.selectAll(".label-base")
         .data(data)
         .enter()
@@ -386,7 +391,6 @@
         .duration(500)
         .style("opacity", 1);
 
-      // chart title
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", -15)
@@ -446,7 +450,6 @@
       // legs
       g.append("line").attr("x1", 140).attr("y1", 120).attr("x2", 120).attr("y2", 150);
       g.append("line").attr("x1", 120).attr("y1", 150).attr("x2", 115).attr("y2", 165);
-
       g.append("line").attr("x1", 140).attr("y1", 120).attr("x2", 155).attr("y2", 150);
       g.append("line").attr("x1", 155).attr("y1", 150).attr("x2", 160).attr("y2", 165);
 
@@ -459,16 +462,17 @@
       g.append("circle").attr("cx", 110).attr("cy", 110).attr("r", 3).attr("fill", "#4b5563");
       g.append("circle").attr("cx", 170).attr("cy", 105).attr("r", 3).attr("fill", "#4b5563");
 
-      // fade-in + hover stroke change
+      // fade-in
       g.transition()
         .duration(800)
         .style("opacity", 1);
 
+      // hover：线条加粗一点
       g.on("mouseover", function() {
-          d3.select(this).transition().duration(200).attr("stroke-width", 2);
+          d3.select(this).transition().duration(150).attr("stroke-width", 2);
         })
         .on("mouseout", function() {
-          d3.select(this).transition().duration(200).attr("stroke-width", 1.2);
+          d3.select(this).transition().duration(150).attr("stroke-width", 1.2);
         });
     }
 
@@ -493,7 +497,6 @@
         .attr("transform", `translate(${margin.left},${margin.top}) scale(0.8)`)
         .style("opacity", 0.2);
 
-      // grid
       const step = 24;
       for (let x = 0; x <= innerWidth; x += step) {
         g.append("line")
@@ -514,7 +517,6 @@
           .attr("stroke-width", 0.6);
       }
 
-      // land shapes
       const land = [
         [[40, 40],[110, 35],[140, 60],[120, 110],[60, 100]],
         [[170, 50],[240, 45],[260, 80],[230, 110],[185, 95]],
@@ -522,7 +524,7 @@
         [[190, 150],[250, 160],[260, 195],[220, 210],[190, 190]]
       ];
 
-      g.selectAll("polygon.land")
+      const landPolys = g.selectAll("polygon.land")
         .data(land)
         .enter()
         .append("polygon")
@@ -530,9 +532,18 @@
         .attr("points", d => d.map(p => p.join(",")).join(" "))
         .attr("fill", "#f4d7a4")
         .attr("stroke", "#d1a65a")
-        .attr("stroke-width", 0.8);
+        .attr("stroke-width", 0.8)
+        .on("mouseover", function() {
+          d3.select(this)
+            .transition().duration(200)
+            .attr("fill", "#fde7b4");
+        })
+        .on("mouseout", function() {
+          d3.select(this)
+            .transition().duration(200)
+            .attr("fill", "#f4d7a4");
+        });
 
-      // ellipse
       g.append("ellipse")
         .attr("cx", innerWidth * 0.55)
         .attr("cy", innerHeight * 0.45)
@@ -542,7 +553,7 @@
         .attr("stroke", "#dc2626")
         .attr("stroke-width", 2);
 
-      // zoom + fade-in animation
+      // 整个地图缩放+淡入
       g.transition()
         .duration(900)
         .attr("transform", `translate(${margin.left},${margin.top}) scale(1)`)
@@ -579,15 +590,12 @@
         .domain([0, 0.35])
         .range([height, 0]);
 
-      const xAxis = d3.axisBottom(x).ticks(7);
-      const yAxis = d3.axisLeft(y).ticks(5);
-
       svg.append("g")
         .attr("transform", `translate(0,${height})`)
-        .call(xAxis);
+        .call(d3.axisBottom(x).ticks(7));
 
       svg.append("g")
-        .call(yAxis);
+        .call(d3.axisLeft(y).ticks(5));
 
       svg.append("text")
         .attr("x", width / 2)
@@ -630,23 +638,30 @@
         .y0(y(0))
         .y1(d => y(d.y));
 
-      // overlap area fades in
-      svg.append("path")
+      const overlapPath = svg.append("path")
         .datum(overlap)
         .attr("fill", "#9ca3af")
         .attr("opacity", 0)
-        .attr("d", areaOverlap)
+        .attr("d", areaOverlap);
+
+      overlapPath
         .transition()
         .duration(700)
         .attr("opacity", 0.5);
 
-      // curves with line-drawing animation
+      // Gaussian curves with line drawing + hover
       const path0 = svg.append("path")
         .datum(data0)
         .attr("fill", "none")
         .attr("stroke", "#f59e0b")
         .attr("stroke-width", 2)
-        .attr("d", lineGen);
+        .attr("d", lineGen)
+        .on("mouseover", function() {
+          d3.select(this).transition().duration(150).attr("stroke-width", 3);
+        })
+        .on("mouseout", function() {
+          d3.select(this).transition().duration(150).attr("stroke-width", 2);
+        });
 
       const length0 = path0.node().getTotalLength();
       path0
@@ -662,7 +677,13 @@
         .attr("fill", "none")
         .attr("stroke", "#0ea5e9")
         .attr("stroke-width", 2)
-        .attr("d", lineGen);
+        .attr("d", lineGen)
+        .on("mouseover", function() {
+          d3.select(this).transition().duration(150).attr("stroke-width", 3);
+        })
+        .on("mouseout", function() {
+          d3.select(this).transition().duration(150).attr("stroke-width", 2);
+        });
 
       const length1 = path1.node().getTotalLength();
       path1
@@ -673,7 +694,15 @@
         .duration(900)
         .attr("stroke-dashoffset", 0);
 
-      // vertical reference lines
+      // hover on overlap area：变深一点
+      overlapPath
+        .on("mouseover", function() {
+          d3.select(this).transition().duration(150).attr("opacity", 0.8);
+        })
+        .on("mouseout", function() {
+          d3.select(this).transition().duration(150).attr("opacity", 0.5);
+        });
+
       const vlines = [0, 1, 2];
       svg.selectAll(".vline")
         .data(vlines)
@@ -688,7 +717,6 @@
         .attr("stroke-dasharray", "4,3")
         .attr("stroke-width", 1);
 
-      // legend
       const legend = svg.append("g")
         .attr("transform", `translate(${width - 160}, 10)`);
 
@@ -720,5 +748,6 @@
     drawChart10();
     drawChart11();
   </script>
+  
 </body>
 </html>
